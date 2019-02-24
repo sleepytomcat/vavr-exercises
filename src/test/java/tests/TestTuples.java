@@ -2,17 +2,32 @@ package tests;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.Tuple8;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestTuples {
 	@Test
 	public void tupleCreation() {
+		// Tuple2
 		Tuple2<String, String> tuple = Tuple.of("hello", "world");
 
 		Assert.assertEquals(tuple._1, "hello");
 		Assert.assertEquals(tuple._2, "world");
 		Assert.assertEquals(tuple.arity(), 2);
+
+		// Tuple8
+		Tuple8<Boolean, Byte, Character, Short, Integer, Long, Float, Double> longTuple
+				= Tuple.of(true, (byte)0, 'a', (short)1, (int)2, (long)3, (float)1.1, (double)2.2);
+
+		Assert.assertEquals(longTuple._1, Boolean.TRUE);
+		Assert.assertEquals(longTuple._2.byteValue(), 0);
+		Assert.assertEquals(longTuple._3.charValue(), 'a');
+		Assert.assertEquals(longTuple._4.shortValue(), 1);
+		Assert.assertEquals(longTuple._5.intValue(), 2);
+		Assert.assertEquals(longTuple._6.longValue(), 3);
+		Assert.assertEquals(longTuple._7.floatValue(), 1.1f);
+		Assert.assertEquals(longTuple._8.doubleValue(), 2.2d);
 	}
 
 	@Test
