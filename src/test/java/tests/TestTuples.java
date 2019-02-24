@@ -1,9 +1,9 @@
-package test;
+package tests;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import org.testng.annotations.Test;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class TestTuples {
 	@Test

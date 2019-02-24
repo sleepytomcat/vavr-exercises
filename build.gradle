@@ -27,7 +27,7 @@ dependencies {
 test {
     // enable TestNG support (default is JUnit)
     useTestNG()
-    include 'test/**'
+    include 'tests/**'
 }
 
 // Define the main class for the application
