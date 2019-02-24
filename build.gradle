@@ -21,6 +21,13 @@ repositories {
 
 dependencies {
     implementation 'io.vavr:vavr:0.9.2'
+    testCompile 'org.testng:testng:6.10'
+}
+
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG()
+    include 'test/**'
 }
 
 // Define the main class for the application
