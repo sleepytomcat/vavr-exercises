@@ -61,14 +61,27 @@ public class TestOption {
 	}
 
 	@Test
-	public void someOfNullContraversity() {
-		Assert.expectThrows(NullPointerException.class, () -> helperMethod());
+	public void someOfNullControversy() {
+		Assert.expectThrows(NullPointerException.class, () -> helperMethodWrong());
 	}
 
-	static Integer helperMethod() {
+	static Integer helperMethodWrong() {
 		return Option.of("hello")
 				.map(str -> (String) null) // results in Option.some(null)
 				.map(str -> str.length()) // NullPointerException, as str is null
+				.getOrElse(-1);
+	}
+
+	@Test
+	public void handlingNullRightWay() {
+		Assert.assertEquals(helperMethodRight(), Integer.valueOf(-1));
+	}
+
+	static Integer helperMethodRight() {
+		return Option.of("hello")
+				.map(str -> (String) null) // results in Option.some(null)
+				.flatMap(str -> Option.of(str)) // str is null; Option.of(null) yields Option.none()
+				.map(str -> str.length()) // no exception, valid call for Option.none()
 				.getOrElse(-1);
 	}
 }
