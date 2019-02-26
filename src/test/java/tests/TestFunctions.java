@@ -50,6 +50,23 @@ public class TestFunctions {
 		Function3<Integer, Integer, Integer, Integer> sum = (x, y, z)-> x + y + z;
 		Function2<Integer, Integer, Integer> f = sum.apply(10); // partially applied, first argument bound
 		Assert.assertEquals(f.apply(3, 4), Integer.valueOf(10 + 3 + 4));
+
+		Function0<Double> randomNumbers = Math::random;
+		Double value1 = randomNumbers.apply();
+		Double value2 = randomNumbers.apply();
+		Double value3 = randomNumbers.apply();
+		// "all values are (most probably) different random numbers
+		Assert.assertNotEquals(value1, value2);
+		Assert.assertNotEquals(value1, value3);
+
+		Function0<Double> memoizedRandomNumbers = randomNumbers.memoized();
+		Double valueA = memoizedRandomNumbers.apply();
+		Double valueB = memoizedRandomNumbers.apply();
+		Double valueC = memoizedRandomNumbers.apply();
+		// memoized function evaluated only once; subsequent calls return same result for same input
+		Assert.assertTrue(memoizedRandomNumbers.isMemoized());
+		Assert.assertEquals(valueA, valueB);
+		Assert.assertEquals(valueA, valueC);
 	}
 
 	private static String helperMethod(Integer number) {
