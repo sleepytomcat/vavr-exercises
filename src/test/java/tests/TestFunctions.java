@@ -34,7 +34,6 @@ public class TestFunctions {
 		// reversed order of args
 		Function2<Float, Float, Float> div = (x, y) -> x / y;
 		Function2<Float, Float, Float> reversedDiv = div.reversed();
-
 		Assert.assertEquals(div.apply(2f, 3f), Float.valueOf(2f/3f));
 		Assert.assertEquals(reversedDiv.apply(2f, 3f), Float.valueOf(3f/2f));
 
@@ -46,6 +45,11 @@ public class TestFunctions {
 		Function1<Tuple2<Float, Float>, Float> tupledDiv = div.tupled();
 		Tuple2<Float, Float> args =  Tuple.of(2f, 3f);
 		Assert.assertEquals(tupledDiv.apply(args), Float.valueOf(2f/3f));
+
+		// partially applied
+		Function3<Integer, Integer, Integer, Integer> sum = (x, y, z)-> x + y + z;
+		Function2<Integer, Integer, Integer> f = sum.apply(10); // partially applied, first argument bound
+		Assert.assertEquals(f.apply(3, 4), Integer.valueOf(10 + 3 + 4));
 	}
 
 	private static String helperMethod(Integer number) {
