@@ -53,7 +53,7 @@ class TestOption {
 		assertFalse(wordLength.isEmpty());
 		assertEquals(wordLength.get(), "text".length());
 
-		// Option.some(null) is valid in Vavr, which may result in unexpected behavior of map()
+		// Option.some(null) is valid in Vavr, which may result in unexpected behavior of map() compared to java.lang.Optional
 		Option<Integer> noWordLength = Option.of("text")
 				// next line results in Option.some(null) which is valid in Vavr, may result in NPE down the road
 				// .map(s -> (String)null)
