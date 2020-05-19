@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.vavr:vavr:0.10.2'
+    implementation 'io.vavr:vavr:0.10.3'
 
     // Use JUnit Jupiter API for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
