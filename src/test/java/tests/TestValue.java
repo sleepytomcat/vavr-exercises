@@ -3,6 +3,10 @@ package tests;
 import io.vavr.Tuple2;
 import io.vavr.Value;
 import io.vavr.collection.List;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import io.vavr.control.Validation;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -100,5 +104,42 @@ public class TestValue {
 
 		java.util.stream.Stream<Integer> javaStream = someValue.toJavaStream();
 		assertEquals(3, javaStream.count());
+	}
+
+	@Test
+	void toControl() {
+		Value<Integer> someValue = List.of(3,4,5);
+		Value<Integer> emptyValue = List.of();
+
+		Either<Exception, Integer> either = someValue.toEither(() -> new RuntimeException());
+		assertTrue(either.isRight());
+		assertEquals(3, either.get()); // picks first element
+
+		Either<Exception, Integer> otherEither = emptyValue.toEither(() -> new RuntimeException());
+		assertTrue(otherEither.isLeft());
+		assertEquals(RuntimeException.class, otherEither.getLeft().getClass());
+
+		Try<Integer> someTry = someValue.toTry(() -> new RuntimeException());
+		assertTrue(someTry.isSuccess());
+		assertEquals(3, someTry.get()); // picks first element
+
+		Try<Integer> anotherTry = emptyValue.toTry(() -> new RuntimeException());
+		assertTrue(anotherTry.isFailure());
+		assertEquals(RuntimeException.class, anotherTry.getCause().getClass());
+
+		Option<Integer> option = someValue.toOption();
+		assertTrue(option.isDefined());
+		assertEquals(3, option.get()); // picks first element
+
+		Option<Integer> anotherOption = emptyValue.toOption();
+		assertTrue(anotherOption.isEmpty());
+
+		Validation<Exception, Integer> validation = someValue.toValidation(() -> new IllegalArgumentException());
+		assertTrue(validation.isValid());
+		assertEquals(3, validation.get());
+
+		Validation<Exception, Integer> anotherValidation = emptyValue.toValidation(() -> new IllegalArgumentException());
+		assertTrue(anotherValidation.isInvalid());
+		assertEquals(IllegalArgumentException.class, anotherValidation.getError().getClass());
 	}
 }
