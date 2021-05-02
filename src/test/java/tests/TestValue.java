@@ -4,6 +4,9 @@ import io.vavr.Value;
 import io.vavr.collection.List;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestValue {
@@ -28,7 +31,7 @@ public class TestValue {
 				element -> assertEquals(1, element)
 		);
 	}
-	
+
 	@Test
 	void get() {
 		Value<Integer> someValue = List.of(1);
@@ -45,5 +48,19 @@ public class TestValue {
 		assertEquals(null, someOtherValue.getOrNull());
 		assertThrows(RuntimeException.class, () -> someOtherValue.getOrElseThrow(() -> new RuntimeException()));
 		assertEquals(1, someOtherValue.getOrElseTry(() -> 1));
+	}
+
+	@Test
+	void collect() {
+		Value<Integer> someValue = List.of(1,2,3);
+		assertEquals(6, someValue.collect(Collectors.summingInt(x -> x)));
+	}
+
+	@Test
+	void correspondsAndEquals() {
+		assertTrue(List.of(1,2,3).corresponds(Arrays.asList(1,2,3), (x, y) -> x == y));
+
+		assertFalse(List.of(1,2,3).equals(Arrays.asList(1,2,3)));
+		assertTrue(List.of(1,2,3).eq(Arrays.asList(1,2,3)));
 	}
 }
