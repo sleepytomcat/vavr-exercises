@@ -28,4 +28,22 @@ public class TestValue {
 				element -> assertEquals(1, element)
 		);
 	}
+	
+	@Test
+	void get() {
+		Value<Integer> someValue = List.of(1);
+		assertFalse(someValue.isSingleValued()); // because this is a list
+		assertEquals(1, someValue.get());
+
+		Value<Integer> someOtherValue = List.empty();
+		assertTrue(someOtherValue.isEmpty());
+		assertFalse(someOtherValue.contains(1));
+		assertFalse(someOtherValue.exists(element -> element == 1));
+
+		assertEquals(1, someOtherValue.getOrElse(1));
+		assertEquals(1, someOtherValue.getOrElse(() -> 1));
+		assertEquals(null, someOtherValue.getOrNull());
+		assertThrows(RuntimeException.class, () -> someOtherValue.getOrElseThrow(() -> new RuntimeException()));
+		assertEquals(1, someOtherValue.getOrElseTry(() -> 1));
+	}
 }
