@@ -68,8 +68,8 @@ class TestEither {
 		assertThrows(RuntimeException.class, () -> someEither.getOrElseThrow(str -> new RuntimeException(str)));
 		assertEquals(456, someEither.getOrElseTry(() -> 456));
 
-		assertThrows(ArithmeticException.class, () -> someEither.getOrElse(() -> {throw new ArithmeticException();}));
-		assertThrows(ArithmeticException.class, () -> someEither.getOrElseTry(() -> {throw new ArithmeticException();}));
+		assertThrows(ArithmeticException.class, () -> someEither.getOrElse(() -> {throw new ArithmeticException();})); // unchecked only
+		assertThrows(Exception.class, () -> someEither.getOrElseTry(() -> {throw new Exception();})); // allows for checked exceptions
 	}
 
 	@Test
