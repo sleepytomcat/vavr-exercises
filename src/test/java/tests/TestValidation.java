@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestLazy {
 	@Test
-	void creation() {
+	void creationAndUsage() {
 		Lazy<Integer> lazyNumber = Lazy.of(() -> fibonacci(10));
 		assertTrue(lazyNumber.isLazy());
 		assertFalse(lazyNumber.isEvaluated());
