@@ -1,50 +1,47 @@
 package tests;
 
-import io.vavr.Lazy;
-import io.vavr.control.Either;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
+import io.vavr.collection.CharSeq;
+import io.vavr.collection.Seq;
+import io.vavr.control.Validation;
 import org.junit.jupiter.api.Test;
 
-import java.util.NoSuchElementException;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class TestLazy {
+class TestValidation {
 	@Test
-	void creationAndUsage() {
-		Lazy<Integer> lazyNumber = Lazy.of(() -> fibonacci(10));
-		assertTrue(lazyNumber.isLazy());
-		assertFalse(lazyNumber.isEvaluated());
+	void validating() {
+		Validation<String, Integer> ageValidation = validateAge(-10);
+		Validation<String, String> nameValidation = validateName("$53$#(%*#");
 
-		int number = lazyNumber.get();
-		assertEquals(55, number);
-		assertTrue(lazyNumber.isEvaluated());
+		Validation<Seq<String>, Person> validatedPerson = Validation.combine(nameValidation, ageValidation).ap(Person::new);
+
+		assertNotNull(validatedPerson.isInvalid());
+		assertTrue(validatedPerson.getError().contains("Age cannot be negative"));
+		assertTrue(validatedPerson.getError().contains("Name contains invalid characters: #$%(*35"));
 	}
 
-	@Test
-	void mapping() {
-		Lazy<Integer> lazyNumber = Lazy.of(() -> fibonacci(10));
-		Lazy<Integer> anotherLazyNumber = lazyNumber.map(x -> x + 1);
-
-		assertFalse(lazyNumber.isEvaluated());
-		assertFalse(anotherLazyNumber.isEvaluated());
-
-		int number = anotherLazyNumber.get();
-
-		assertEquals(56, number);
-		assertTrue(lazyNumber.isEvaluated());
-		assertTrue(anotherLazyNumber.isEvaluated());
+	private Validation<String, Integer> validateAge(Integer age) {
+		return age > 0
+				? Validation.valid(age)
+				: Validation.invalid("Age cannot be negative");
 	}
 
-	int fibonacci(int x) {
-		if (x < 1)
-			throw new IllegalArgumentException();
-		else if (x == 1)
-			return 1;
-		else if (x == 2)
-			return 1;
-		else
-			return fibonacci(x - 1) + fibonacci(x - 2);
+	private Validation<String, String> validateName(String name) {
+		final String VALID_NAME_CHARS = "[a-zA-Z ]";
+		return CharSeq.of(name).replaceAll(VALID_NAME_CHARS, "").transform(
+				seq -> seq.isEmpty()
+					? Validation.valid(name)
+					: Validation.invalid("Name contains invalid characters: " + seq.distinct().sorted())
+		);
+	}
+
+	static class Person {
+		final String name;
+		final Integer age;
+		public Person(String name, Integer age) {
+			this.name = name;
+			this.age = age;
+		}
 	}
 }

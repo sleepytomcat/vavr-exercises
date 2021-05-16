@@ -37,7 +37,7 @@ class TestLazy {
 		assertTrue(anotherLazyNumber.isEvaluated());
 	}
 
-	int fibonacci(int x) {
+	private int fibonacci(int x) {
 		if (x < 1)
 			throw new IllegalArgumentException();
 		else if (x == 1)
