@@ -76,12 +76,21 @@ class TestTraversable {
 		assertEquals('$', SOME_CHARACTERS.lastOption().get());
 		assertTrue(NONE_CHARACTERS.lastOption().isEmpty());
 
+		// tail()
+		assertEquals(SOME_CHARACTERS.tail(), Array.of('b', 'c', '$'));
+		assertEquals(ONE_CHARACTER.tail(), Array.empty());
+		assertThrows(UnsupportedOperationException.class, () -> NONE_CHARACTERS.tail());
 
-		/*
-		size()
-		tail()
-		tailOption()
-		*/
+		// tailOption()
+		assertTrue(SOME_CHARACTERS.tailOption().isDefined());
+		assertEquals(SOME_CHARACTERS.tailOption().get(), Array.of('b', 'c', '$'));
+		assertTrue(ONE_CHARACTER.tailOption().isDefined());
+		assertTrue(ONE_CHARACTER.tailOption().get().isEmpty());
+		assertTrue(NONE_CHARACTERS.tailOption().isEmpty());
+
+		// size()
+		assertTrue(SOME_CHARACTERS.size() > 0);
+		assertEquals(0, NONE_CHARACTERS.size());
 	}
 
 	@Test
