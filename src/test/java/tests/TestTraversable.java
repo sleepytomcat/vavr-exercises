@@ -4,10 +4,13 @@ import io.vavr.PartialFunction;
 import io.vavr.collection.Array;
 import io.vavr.collection.Iterator;
 import io.vavr.collection.Traversable;
+import io.vavr.control.Option;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -149,17 +152,38 @@ class TestTraversable {
 
 	@Test
 	void numericOperations() {
-		/*
-		average()
-		max()
-		maxBy(Comparator)
-		maxBy(Function)
-		min()
-		minBy(Comparator)
-		minBy(Function)
-		product()
-		sum()
-		 */
+		final Traversable<Double> SOME_NUMBERS = Array.of(0.0, -3.0, 2.0, 0.0);
+		final Traversable<Double> NONE_NUMBERS = Array.of();
+
+		// average()
+		assertEquals(Option.some(-0.25), SOME_NUMBERS.average());
+		assertEquals(Option.none(), NONE_NUMBERS.average());
+		// max()
+		assertEquals(Option.some(2.0), SOME_NUMBERS.max());
+		assertEquals(Option.none(), NONE_NUMBERS.max());
+		// maxBy(Comparator)
+		Comparator<Double> compareByAbsoluteValue = (x, y) -> Math.abs(x) > Math.abs(y) ? 1 : x == y ? 0 : -1;
+		assertEquals(Option.some(-3.0), SOME_NUMBERS.maxBy(compareByAbsoluteValue));
+		assertEquals(Option.none(), NONE_NUMBERS.maxBy(compareByAbsoluteValue));
+		// maxBy(Function)
+		Function<Double, String> mapToString = x -> String.valueOf(x);
+		assertEquals(Option.some(2.0), SOME_NUMBERS.maxBy(mapToString)); // numbers are mapped to "0.0", "-3.0", "2.0"... and then strings are compared
+		assertEquals(Option.none(), NONE_NUMBERS.maxBy(mapToString));
+		// min()
+		assertEquals(Option.some(-3.0), SOME_NUMBERS.min());
+		assertEquals(Option.none(), NONE_NUMBERS.min());
+		// minBy(Comparator)
+		assertEquals(Option.some(0.0), SOME_NUMBERS.minBy(compareByAbsoluteValue));
+		assertEquals(Option.none(), NONE_NUMBERS.minBy(compareByAbsoluteValue));
+		// minBy(Function)
+		assertEquals(Option.some(-3.0), SOME_NUMBERS.minBy(mapToString)); // numbers are mapped to "0.0", "-3.0", "2.0"... and then strings are compared
+		assertEquals(Option.none(), NONE_NUMBERS.minBy(mapToString));
+		// sum()
+		assertEquals(-1.0, SOME_NUMBERS.sum());
+		assertEquals(0, NONE_NUMBERS.sum());
+		// product
+		assertEquals(-0.0, SOME_NUMBERS.product());
+		assertEquals(1, NONE_NUMBERS.product());
 	}
 
 	@Test
