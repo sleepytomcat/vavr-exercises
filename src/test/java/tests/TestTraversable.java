@@ -18,6 +18,9 @@ class TestTraversable {
 	static final Traversable<Character> SOME_CHARACTERS = Array.of('a', 'b', 'c', '$');
 	static final Traversable<Character> ONE_CHARACTER = Array.of('a');
 	static final Traversable<Character> NONE_CHARACTERS = Array.empty();
+	static final Traversable<Double> SOME_NUMBERS = Array.of(0.0, -3.0, 2.0, 0.0);
+	static final Traversable<Double> NONE_NUMBERS = Array.of();
+
 
 	@Test
 	void basicOperations() {
@@ -152,9 +155,6 @@ class TestTraversable {
 
 	@Test
 	void numericOperations() {
-		final Traversable<Double> SOME_NUMBERS = Array.of(0.0, -3.0, 2.0, 0.0);
-		final Traversable<Double> NONE_NUMBERS = Array.of();
-
 		// average()
 		assertEquals(Option.some(-0.25), SOME_NUMBERS.average());
 		assertEquals(Option.none(), NONE_NUMBERS.average());
@@ -188,11 +188,16 @@ class TestTraversable {
 
 	@Test
 	void reductionFolding() {
+		// count(Predicate)
+		assertEquals(3, SOME_NUMBERS.count(x -> x <= 0.0));
+		// fold(Object, BiFunction)
+		assertEquals(-1.0, SOME_NUMBERS.fold(0.0, (x,y) -> x + y)); // folding elements into object of same type
+		// foldLeft(Object, BiFunction)
+		assertEquals(13, SOME_NUMBERS.foldLeft(0, (x,y) -> x + String.valueOf(y).length()));
+		// foldRight(Object, BiFunction)
+		assertEquals(13, SOME_NUMBERS.foldRight(0, (x,y) -> String.valueOf(x).length() + y));
+
 		/*
-		count(Predicate)
-		fold(Object, BiFunction)
-		foldLeft(Object, BiFunction)
-		foldRight(Object, BiFunction)
 		mkString()
 		mkString(CharSequence)
 		mkString(CharSequence, CharSequence, CharSequence)
