@@ -1,17 +1,15 @@
 package tests;
 
+import io.vavr.PartialFunction;
 import io.vavr.collection.Array;
+import io.vavr.collection.Iterator;
 import io.vavr.collection.Traversable;
-import io.vavr.control.Either;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import io.vavr.PartialFunction;
 
 class TestTraversable {
 	static final Traversable<Character> SOME_CHARACTERS = Array.of('a', 'b', 'c', '$');
@@ -95,14 +93,58 @@ class TestTraversable {
 
 	@Test
 	void iteration() {
-		/*
-		forEachWithIndex(ObjIntConsumer)
-		grouped(int)
-		iterator()
-		slideBy(Function)
-		sliding(int)
-		sliding(int, int)
-		*/
+		// forEachWithIndex(ObjIntConsumer)
+		ONE_CHARACTER.forEachWithIndex((character, index) -> {
+			assertEquals(0, index);
+			assertEquals('a', character);
+		});
+
+		// grouped(int): grouping Traversable<> into blocks of given size.
+		Iterator<? extends Traversable<Character>> iterator = SOME_CHARACTERS.grouped(3);
+		Traversable<Character> firstBlock = iterator.get();
+		assertEquals(3, firstBlock.size());
+		assertEquals(Array.of('a','b','c'), firstBlock); // three elements in first block
+		Traversable<Character> secondBlock = iterator.next();
+		assertEquals(1, secondBlock.size()); // only one element in the last block
+		assertEquals(Array.of('$'), secondBlock);
+
+		// iterator()
+		Iterator<Character> characterIterator = SOME_CHARACTERS.iterator();
+		assertTrue(characterIterator.hasNext());
+		assertEquals('a', characterIterator.next());
+		assertEquals('b', characterIterator.next());
+		assertEquals('c', characterIterator.next());
+		assertEquals('$', characterIterator.next());
+		assertFalse(characterIterator.hasNext());
+
+		// slideBy(Function): grouping Traversable<> into blocks according to classifier function.
+		// Next element will be assigned to the same group ('sliding window') as previous when classifier
+		// returns same value for both.
+		Traversable<Integer> numbers = Array.of(1,2,4,10,11,3,4);
+		Iterator<? extends Traversable<Integer>> numbersIterator = numbers.slideBy(x -> x/10);
+		Traversable<Integer> firstNumbersSlidingWindow = numbersIterator.next();
+		assertEquals(Array.of(1,2,4), firstNumbersSlidingWindow);
+		Traversable<Integer> secondNumbersSlidingWindow = numbersIterator.next();
+		assertEquals(Array.of(10,11), secondNumbersSlidingWindow);
+		Traversable<Integer> thirdNumbersSlidingWindow = numbersIterator.next();
+		assertEquals(Array.of(3,4), thirdNumbersSlidingWindow);
+		assertFalse(numbersIterator.hasNext());
+
+		// sliding(int, int)
+		Iterator<? extends Traversable<Character>> slidingIterator = SOME_CHARACTERS.sliding(2, 3);
+		Traversable<Character> firstSlidingWindow = slidingIterator.next();
+		assertEquals(Array.of('a', 'b'), firstSlidingWindow);
+		Traversable<Character> secondSlidingWindow = slidingIterator.next();
+		assertEquals(Array.of('$'), secondSlidingWindow);
+		assertFalse(slidingIterator.hasNext());
+
+		// sliding(int): same as sliding(int, 1)
+		Iterator<? extends Traversable<Character>> slidingByOneIterator = SOME_CHARACTERS.sliding(3);
+		Traversable<Character> firstSlidingByOneWindow = slidingByOneIterator.next();
+		assertEquals(Array.of('a', 'b', 'c'), firstSlidingByOneWindow);
+		Traversable<Character> secondSlidingByOneWindow = slidingByOneIterator.next();
+		assertEquals(Array.of('b', 'c', '$'), secondSlidingByOneWindow);
+		assertFalse(slidingByOneIterator.hasNext());
 	}
 
 	@Test
