@@ -1,9 +1,8 @@
 package tests;
 
 import io.vavr.PartialFunction;
-import io.vavr.collection.Array;
-import io.vavr.collection.Iterator;
-import io.vavr.collection.Traversable;
+import io.vavr.Tuple2;
+import io.vavr.collection.*;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.Test;
 
@@ -192,76 +191,118 @@ class TestTraversable {
 		assertEquals(3, SOME_NUMBERS.count(x -> x <= 0.0));
 		// fold(Object, BiFunction)
 		assertEquals(-1.0, SOME_NUMBERS.fold(0.0, (x,y) -> x + y)); // folding elements into object of same type
-		// foldLeft(Object, BiFunction)
+		// foldLeft(Object, BiFunction): starts from head of Traversable, uses provided 'zero' value as a starting accumulator value
 		assertEquals(13, SOME_NUMBERS.foldLeft(0, (x,y) -> x + String.valueOf(y).length()));
-		// foldRight(Object, BiFunction)
+		// foldRight(Object, BiFunction): starts from tail of Traversable, uses provided 'zero' value as a starting accumulator value
 		assertEquals(13, SOME_NUMBERS.foldRight(0, (x,y) -> String.valueOf(x).length() + y));
-
-		/*
-		mkString()
-		mkString(CharSequence)
-		mkString(CharSequence, CharSequence, CharSequence)
-		reduce(BiFunction)
-		reduceOption(BiFunction)
-		reduceLeft(BiFunction)
-		reduceLeftOption(BiFunction)
-		reduceRight(BiFunction)
-		reduceRightOption(BiFunction)
-		 */
+		// reduce(BiFunction)
+		assertEquals(-1.0, SOME_NUMBERS.reduce((x,y) -> x + y)); // reducing elements into one
+		assertThrows(NoSuchElementException.class, () -> NONE_NUMBERS.reduce((x,y) -> x + y));
+		// reduceOption(BiFunction)
+		assertEquals(Option.some(-1.0), SOME_NUMBERS.reduceOption((x,y) -> x + y)); // reducing elements into one
+		assertEquals(Option.none(), NONE_NUMBERS.reduceOption((x,y) -> x + y));
+		// reduceLeft(BiFunction): starts from head, reduces elements into one
+		assertEquals(-1.0, SOME_NUMBERS.reduceLeft((x,y) -> x + y)); // reducing elements into one
+		assertThrows(NoSuchElementException.class, () -> NONE_NUMBERS.reduceLeft((x,y) -> x + y));
+		// reduceLeftOption(BiFunction)
+		assertEquals(Option.some(-1.0), SOME_NUMBERS.reduceLeftOption((x,y) -> x + y));
+		assertEquals(Option.none(), NONE_NUMBERS.reduceLeftOption((x,y) -> x + y));
+		// reduceRight(BiFunction): starts from tail, reduces elements into one
+		assertEquals(-1.0, SOME_NUMBERS.reduceRight((x,y) -> x + y)); // reducing elements into one
+		assertThrows(NoSuchElementException.class, () -> NONE_NUMBERS.reduceRight((x,y) -> x + y));
+		// reduceRightOption(BiFunction)
+		assertEquals(Option.some(-1.0), SOME_NUMBERS.reduceRightOption((x,y) -> x + y));
+		assertEquals(Option.none(), NONE_NUMBERS.reduceRightOption((x,y) -> x + y));
+		// mkString()
+		assertEquals("abc$", SOME_CHARACTERS.mkString());
+		// mkString(CharSequence)
+		assertEquals("a+b+c+$", SOME_CHARACTERS.mkString(CharSeq.of("+")));
+		// mkString(CharSequence, CharSequence, CharSequence)
+		assertEquals("[a,b,c,$]", SOME_CHARACTERS.mkString(CharSeq.of("["), CharSeq.of(","), CharSeq.of("]")));
 	}
 
 	@Test
 	void selection() {
-		/*
-		drop(int)
-		dropRight(int)
-		dropUntil(Predicate)
-		dropWhile(Predicate)
-		filter(Predicate)
-		filterNot(Predicate)
-		find(Predicate)
-		findLast(Predicate)
-		groupBy(Function)
-		partition(Predicate)
-		retainAll(Iterable)
-		take(int)
-		takeRight(int)
-		takeUntil(Predicate)
-		takeWhile(Predicate)
-		*/
+		// drop(int)
+		assertEquals(Array.of('b', 'c', '$'), SOME_CHARACTERS.drop(1));
+		assertEquals(Array.empty(), SOME_CHARACTERS.drop(100));
+		// dropRight(int)
+		assertEquals(Array.of('a', 'b', 'c'), SOME_CHARACTERS.dropRight(1));
+		assertEquals(Array.empty(), SOME_CHARACTERS.dropRight(100));
+		// dropUntil(Predicate)
+		assertEquals(Array.of('c', '$'), SOME_CHARACTERS.dropUntil(character -> character == 'c'));
+		assertEquals(Array.empty(), SOME_CHARACTERS.dropUntil(character -> character == '%'));
+		// dropWhile(Predicate)
+		assertEquals(Array.of('c', '$'), SOME_CHARACTERS.dropWhile(character -> (character == 'a' || character == 'b')));
+		assertEquals(Array.of('a', 'b', 'c', '$'), SOME_CHARACTERS.dropWhile(character -> character == '%'));
+		// filter(Predicate)
+		assertEquals(Array.of('b', 'c'), SOME_CHARACTERS.filter(character -> (character == 'b' || character == 'c')));
+		// reject(Predicate)
+		assertEquals(Array.of('a', '$'), SOME_CHARACTERS.reject(character -> (character == 'b' || character == 'c')));
+		// find(Predicate)
+		assertEquals(Option.some('b'), SOME_CHARACTERS.find(character -> character == 'b'));
+		assertEquals(Option.none(), SOME_CHARACTERS.find(character -> character == '%'));
+		// findLast(Predicate)
+		assertEquals(Option.some('c'), SOME_CHARACTERS.findLast(character -> (character == 'b' || character == 'c')));
+		assertEquals(Option.none(), SOME_CHARACTERS.findLast(character -> character == '%'));
+		// groupBy(Function)
+		Map<String, ? extends Traversable<Character>> groups = SOME_CHARACTERS.groupBy(character -> Character.isAlphabetic(character) ? "ALPHABETIC" : "NONALPHABETIC");
+		assertEquals(Array.of('a','b','c'), groups.get("ALPHABETIC").get());
+		assertEquals(Array.of('$'), groups.get("NONALPHABETIC").get());
+		// partition(Predicate)
+		Tuple2<? extends Traversable<Character>, ? extends Traversable<Character>> partitions = SOME_CHARACTERS.partition(character -> character == 'a' || character == 'c');
+		assertTrue(partitions._1().containsAll(Array.of('a', 'c')));
+		assertTrue(partitions._2().containsAll(Array.of('b', '$')));
+		// retainAll(Iterable)
+		assertEquals(Array.of('a', '$'), SOME_CHARACTERS.retainAll(Arrays.asList('a', '$')));
+		assertEquals(Array.empty(), NONE_CHARACTERS.retainAll(Arrays.asList('a', '$')));
+		// take(int)
+		assertEquals(Array.of('a', 'b'), SOME_CHARACTERS.take(2));
+		assertEquals(Array.empty(), NONE_CHARACTERS.take(100));
+		// takeRight(int)
+		assertEquals(Array.of('c', '$'), SOME_CHARACTERS.takeRight(2));
+		assertEquals(Array.empty(), NONE_CHARACTERS.takeRight(100));
+		// takeUntil(Predicate)
+		assertEquals(Array.of('a', 'b'), SOME_CHARACTERS.takeUntil(character -> character == 'c'));
+		assertEquals(Array.of('a', 'b', 'c', '$'), SOME_CHARACTERS.takeUntil(character -> character == '%'));
+		// takeWhile(Predicate)
+		assertEquals(Array.of('a', 'b'), SOME_CHARACTERS.takeWhile(character -> (character == 'a' || character == 'b')));
+		assertEquals(Array.empty(), SOME_CHARACTERS.takeWhile(character -> character == '%'));
 	}
 
 	@Test
 	void tests() {
-		/*
-		existsUnique(Predicate)
-		hasDefiniteSize()
-		isDistinct()
-		isOrdered()
-		isSequential()
-		isTraversableAgain()
-		 */
+		// existsUnique(Predicate)
+		assertTrue(Array.of(1,2,2,-3,3).existsUnique(x -> x < 0));
+		assertFalse(Array.of(1,2,2,-3,3).existsUnique(x -> x > 0));
+		// hasDefiniteSize()
+		assertTrue(Array.of(1,2,3).hasDefiniteSize());
+		assertFalse(Stream.iterate(() -> Option.some(0)).hasDefiniteSize()); // infinite stream
+		// isDistinct()
+		assertFalse(Array.of(1,2,2,3).isDistinct()); // i.e. Array do not enforce element to be distinct
+		assertTrue(HashSet.of(1,2,2,3).isDistinct()); // i.e. HashSet does enforce element to be distinct
+		// isOrdered()
+		// isSequential()
+		// isTraversableAgain()
 	}
 
 	@Test
 	void transformation() {
-		/*
-		distinct()
-		distinctBy(Comparator)
-		distinctBy(Function)
-		flatMap(Function)
-		map(Function)
-		replace(Object, Object)
-		replaceAll(Object, Object)
-		scan(Object, BiFunction)
-		scanLeft(Object, BiFunction)
-		scanRight(Object, BiFunction)
-		span(Predicate)
-		unzip(Function)
-		unzip3(Function)
-		zip(Iterable)
-		zipAll(Iterable, Object, Object)
-		zipWithIndex()
-		 */
+		// distinct()
+		// distinctBy(Comparator)
+		// distinctBy(Function)
+		// flatMap(Function)
+		// map(Function)
+		// replace(Object, Object)
+		// replaceAll(Object, Object)
+		// scan(Object, BiFunction)
+		// scanLeft(Object, BiFunction)
+		// scanRight(Object, BiFunction)
+		// span(Predicate)
+		// unzip(Function)
+		// unzip3(Function)
+		// zip(Iterable)
+		// zipAll(Iterable, Object, Object)
+		// zipWithIndex()
 	}
 }
