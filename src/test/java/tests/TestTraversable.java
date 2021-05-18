@@ -279,11 +279,18 @@ class TestTraversable {
 		assertTrue(Array.of(1,2,3).hasDefiniteSize());
 		assertFalse(Stream.iterate(() -> Option.some(0)).hasDefiniteSize()); // infinite stream
 		// isDistinct()
-		assertFalse(Array.of(1,2,2,3).isDistinct()); // i.e. Array do not enforce element to be distinct
-		assertTrue(HashSet.of(1,2,2,3).isDistinct()); // i.e. HashSet does enforce element to be distinct
+		assertFalse(Array.of(1,2,3).isDistinct()); // i.e. Array does not enforce element to be distinct
+		assertTrue(HashSet.of(1,2,3).isDistinct()); // i.e. HashSet does enforce element to be distinct
 		// isOrdered()
+		assertFalse(Array.of(1,2,3).isOrdered());
+		assertTrue(TreeSet.of(1,2,3).isOrdered());
 		// isSequential()
+		assertTrue(Array.of(1,2,3).isSequential()); // i.e. Arrays are sequential
+		assertFalse(HashSet.of(1,2,3).isSequential()); // i.e. HashSets are not sequential
+		assertTrue(LinkedHashSet.of(1,2,3).isSequential()); // i.e. LinkedHashSets are sequential
 		// isTraversableAgain()
+		assertTrue(Array.of(1,2,3).isTraversableAgain());
+		assertFalse(Iterator.of(1,2,3).isTraversableAgain()); // iterators are traversable only once
 	}
 
 	@Test
