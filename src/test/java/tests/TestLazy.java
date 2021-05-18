@@ -1,12 +1,7 @@
 package tests;
 
 import io.vavr.Lazy;
-import io.vavr.control.Either;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
-
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
