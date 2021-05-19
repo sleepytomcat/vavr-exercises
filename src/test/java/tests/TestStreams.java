@@ -1,21 +1,8 @@
 package tests;
 
-import io.vavr.Tuple2;
-import io.vavr.Value;
 import io.vavr.collection.Array;
-import io.vavr.collection.List;
 import io.vavr.collection.Stream;
-import io.vavr.control.Either;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
-import io.vavr.control.Validation;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
