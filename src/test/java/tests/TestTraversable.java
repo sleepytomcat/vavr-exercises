@@ -358,7 +358,7 @@ class TestTraversable {
 		// replaceAll(Object, Object)
 		assertEquals(Array.of(1, 0, 0, 0, 3), Array.of(1, 2, 2, 2, 3).replaceAll(2, 0));
 
-		// scan(Object, BiFunction)
+		// scan(Object, BiFunction): https://en.wikipedia.org/wiki/Prefix_sum
 		assertEquals(Array.of(0, 1, 3, 6, 10, 15), Array.of(1, 2, 3, 4, 5).scan(0, (x,y) -> x + y));
 
 		// scanLeft(Object, BiFunction)
